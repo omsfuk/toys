@@ -7,7 +7,7 @@
 大一11月份做的一个2048，是时初涉Java，所为浅陋。
 画面尚可，具有简陋AI
 
-![2048](https://github.com/omsfuk/toys/master/_2048/2048.png "2048")
+![2048](https://github.com/omsfuk/toys/blob/master/_2048/screenshot.PNG?raw=true "2048")
 
 ## FileServer
 一个简单的web文件服务器。大一寒假无聊时搞得一个工具，主要是想通过局域网在手机和电脑之间传文件。
