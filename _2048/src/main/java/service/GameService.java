@@ -1,6 +1,6 @@
 package service;
 
-import dto.DtoGame;
+import model.GameState;
 
 import java.awt.Point;
 import java.util.Random;
@@ -9,7 +9,7 @@ import java.util.Random;
 /**
  * Created by Administrator on 2016/11/26.
  */
-public class ServiceGame {
+public class GameService {
 
     /**
      * 方块初始值
@@ -19,13 +19,13 @@ public class ServiceGame {
     /**
      * 数据传输对象
      */
-    private DtoGame dto = new DtoGame();
+    private GameState dto = new GameState();
 
     /**
      * 构造方法
      * @param dto 数据访问对象
      */
-    public ServiceGame(DtoGame dto) {
+    public GameService(GameState dto) {
         this.dto = dto;
         start();
         
@@ -57,21 +57,20 @@ public class ServiceGame {
     
     /**
      * 检查是否失败
-     * @param offest 偏移量
      * @return 是否失败
      */
     private boolean isLost() {
         int[][] gameMap = dto.getGameMap();
         
-        for (int col = 0; col < DtoGame.COL; col++) {
-        	for (int row = 0; row < DtoGame.ROW; row++) {
-        		if(col + 1< DtoGame.COL && gameMap[col][row] == gameMap[col + 1][row]) {
+        for (int col = 0; col < GameState.COL; col++) {
+        	for (int row = 0; row < GameState.ROW; row++) {
+        		if(col + 1< GameState.COL && gameMap[col][row] == gameMap[col + 1][row]) {
         			return false;
         		}
         		if(col - 1> -1 && gameMap[col][row] == gameMap[col - 1][row]) {
         			return false;
         		}
-        		if(row + 1< DtoGame.ROW && gameMap[col][row] == gameMap[col][row + 1]) {
+        		if(row + 1< GameState.ROW && gameMap[col][row] == gameMap[col][row + 1]) {
         			return false;
         		}
         		if(row - 1> -1 && gameMap[col][row] == gameMap[col][row - 1]) {
@@ -88,8 +87,8 @@ public class ServiceGame {
      */
     private boolean isFull() {
         int[][] gameMap = dto.getGameMap();
-        for (int col = 0; col < DtoGame.COL; col++) {
-            for (int row = 0; row < DtoGame.ROW; row++) {
+        for (int col = 0; col < GameState.COL; col++) {
+            for (int row = 0; row < GameState.ROW; row++) {
                 if(gameMap[col][row] == 0) {
                     return false;
                 }
@@ -104,12 +103,12 @@ public class ServiceGame {
      */
     private Point getEmptyPos() {
         Random r = new Random();
-        int col = r.nextInt(DtoGame.COL);
-        int row = r.nextInt(DtoGame.ROW);
+        int col = r.nextInt(GameState.COL);
+        int row = r.nextInt(GameState.ROW);
         int[][] gameMap = dto.getGameMap();
         while (gameMap[col][row] != 0) {
-            col = r.nextInt(DtoGame.COL);
-            row = r.nextInt(DtoGame.ROW);
+            col = r.nextInt(GameState.COL);
+            row = r.nextInt(GameState.ROW);
         }
         return new Point(col, row);
     }
@@ -128,10 +127,10 @@ public class ServiceGame {
      * @return 游戏地图副本
      */
     private int[][] getGameMapCopy() {
-        int[][] gameMap = new int[DtoGame.COL][DtoGame.ROW];
+        int[][] gameMap = new int[GameState.COL][GameState.ROW];
         int[][] gameMapTmp = dto.getGameMap();
-        for (int col = 0; col < DtoGame.COL; col++) {
-            for (int row = 0; row < DtoGame.ROW; row++) {
+        for (int col = 0; col < GameState.COL; col++) {
+            for (int row = 0; row < GameState.ROW; row++) {
                 gameMap[col][row] = gameMapTmp[col][row];
             }
         }
@@ -144,11 +143,11 @@ public class ServiceGame {
      */
     public Point[][] getUpCombine() {
     	int[][] gameMap = getGameMapCopy();
-        Point[][] offest = new Point[DtoGame.COL][DtoGame.ROW];
+        Point[][] offest = new Point[GameState.COL][GameState.ROW];
         
-        for (int col = 0; col < DtoGame.COL; col++) {
-        	for (int row = 0; row < DtoGame.ROW; row++) {
-        		boolean[] isDealed = new boolean[DtoGame.ROW];
+        for (int col = 0; col < GameState.COL; col++) {
+        	for (int row = 0; row < GameState.ROW; row++) {
+        		boolean[] isDealed = new boolean[GameState.ROW];
         		int rowTest = row - 1;
         		   
         		if(gameMap[col][row] == 0) {
@@ -185,11 +184,11 @@ public class ServiceGame {
      */
     public Point[][] getDownCombine() {
     	int[][] gameMap = getGameMapCopy();
-        Point[][] offest = new Point[DtoGame.COL][DtoGame.ROW];
+        Point[][] offest = new Point[GameState.COL][GameState.ROW];
         
-        for (int col = 0; col < DtoGame.COL; col++) {
-        	for (int row = DtoGame.ROW - 1; row > -1; row--) {
-        		boolean[] isDealed = new boolean[DtoGame.ROW];
+        for (int col = 0; col < GameState.COL; col++) {
+        	for (int row = GameState.ROW - 1; row > -1; row--) {
+        		boolean[] isDealed = new boolean[GameState.ROW];
         		int rowTest = row + 1;
         		   
         		if(gameMap[col][row] == 0) {
@@ -197,11 +196,11 @@ public class ServiceGame {
         			continue;
         		}
         		
-        		while(rowTest < DtoGame.ROW && gameMap[col][rowTest] == 0) {
+        		while(rowTest < GameState.ROW && gameMap[col][rowTest] == 0) {
         			rowTest ++;
         		}
         		
-        		if(rowTest > DtoGame.ROW - 1) {
+        		if(rowTest > GameState.ROW - 1) {
         			offest[col][row] = new Point(col, rowTest - 1);        	
         			moveBlock(gameMap, col, row, col, rowTest - 1);        			
         			continue;
@@ -226,11 +225,11 @@ public class ServiceGame {
      */
     public Point[][] getLeftCombine() {
     	int[][] gameMap = getGameMapCopy();
-        Point[][] offest = new Point[DtoGame.COL][DtoGame.ROW];
+        Point[][] offest = new Point[GameState.COL][GameState.ROW];
         
-        for (int row = 0; row < DtoGame.ROW; row++) {
-        	for (int col = 0; col < DtoGame.COL; col++) {
-        		boolean[] isDealed = new boolean[DtoGame.COL];
+        for (int row = 0; row < GameState.ROW; row++) {
+        	for (int col = 0; col < GameState.COL; col++) {
+        		boolean[] isDealed = new boolean[GameState.COL];
         		int colTest = col - 1;
         		   
         		if(gameMap[col][row] == 0) {
@@ -267,11 +266,11 @@ public class ServiceGame {
      */
     public Point[][] getRightCombine() {
     	int[][] gameMap = getGameMapCopy();
-        Point[][] offest = new Point[DtoGame.COL][DtoGame.ROW];
+        Point[][] offest = new Point[GameState.COL][GameState.ROW];
         
-        for (int row = 0; row < DtoGame.ROW; row++) {
-        	for (int col = DtoGame.ROW - 1; col > -1; col--) {
-        		boolean[] isDealed = new boolean[DtoGame.COL];
+        for (int row = 0; row < GameState.ROW; row++) {
+        	for (int col = GameState.ROW - 1; col > -1; col--) {
+        		boolean[] isDealed = new boolean[GameState.COL];
         		int colTest = col + 1;
         		   
         		if(gameMap[col][row] == 0) {
@@ -279,11 +278,11 @@ public class ServiceGame {
         			continue;
         		}
         		
-        		while(colTest < DtoGame.COL && gameMap[colTest][row] == 0) {
+        		while(colTest < GameState.COL && gameMap[colTest][row] == 0) {
         			colTest ++;
         		}
         		
-        		if(colTest > DtoGame.COL - 1) {
+        		if(colTest > GameState.COL - 1) {
         			offest[col][row] = new Point(colTest - 1, row);        	
         			moveBlock(gameMap, col, row, colTest - 1, row);        			
         			continue;

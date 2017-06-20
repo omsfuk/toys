@@ -1,6 +1,6 @@
 package ui;
 
-import dto.DtoGame;
+import model.GameState;
 
 import java.awt.Graphics;
 
@@ -14,7 +14,7 @@ public class LayerGame extends Layer {
 	 */
     private static final int BLOCK_SIZE = 64;
 
-    private DtoGame dto = null;
+    private GameState dto = null;
     /**
      * 构造方法
      * @param x 相对 x 坐标
@@ -22,7 +22,7 @@ public class LayerGame extends Layer {
      * @param width 宽度
      * @param height 高度
      */
-    public LayerGame(int x, int y, int width, int height, DtoGame dto) {
+    public LayerGame(int x, int y, int width, int height, GameState dto) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -39,8 +39,8 @@ public class LayerGame extends Layer {
 
     private void drawGameMap(Graphics g) {
         int[][] gameMap = dto.getGameMap();
-        for (int col = 0; col < DtoGame.COL; col++) {
-            for(int row = 0; row < DtoGame.ROW; row++) {
+        for (int col = 0; col < GameState.COL; col++) {
+            for(int row = 0; row < GameState.ROW; row++) {
                 int numIndex = gameMap[col][row];
                 g.drawImage(Img.BLOCK,
                     this.x + col * (BLOCK_SIZE + INNER_PADDING) + INNER_PADDING,

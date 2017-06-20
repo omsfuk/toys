@@ -1,6 +1,8 @@
 package ui;
 
-import java.awt.Toolkit;
+import model.GameState;
+
+import java.awt.*;
 
 import javax.swing.JFrame;
 
@@ -19,11 +21,14 @@ public class JFrameGame extends JFrame {
      * 窗口高度
      */
     private static final int windowHeight = 448 + 30;
+
+    private JPanelGame panelGame;
     
     /**
      * 构造方法
      */
-    public JFrameGame(JPanelGame panelGame) {
+    public JFrameGame(UIContext uiContext, GameState gameState) {
+        panelGame = new JPanelGame(uiContext, gameState);
     	// 设置标题
     	this.setTitle("2048");
         // 设置默认关闭按钮
@@ -35,10 +40,36 @@ public class JFrameGame extends JFrame {
         // 设置默认panel
         setContentPane(panelGame);
         // 设置窗口位置
-        int width = (int)Toolkit.getDefaultToolkit().getScreenSize().getWidth();
-        int height = (int)Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+        int width = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+        int height = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
         setLocation((width - this.getWidth()) / 2, (height - this.getHeight()) / 2);
         // 设置可见
         setVisible(true);
     }
+
+    public void up(Point[][] offest) {
+        panelGame.move(panelGame.getGraphics(), offest);
+    }
+
+    public void down(Point[][] offest) {
+        panelGame.move(panelGame.getGraphics(), offest);
+    }
+
+    public void left(Point[][] offest) {
+        panelGame.move(panelGame.getGraphics(), offest);
+    }
+
+    public void right(Point[][] offest) {
+        panelGame.move(panelGame.getGraphics(), offest);
+    }
+
+    public void repaintContentPanel() {
+        panelGame.repaint();
+    }
+
+    public void removeContextPanelKeyListener() {
+        panelGame.removeKeyListener();
+    }
+
+    public void addContextPanelKeyListener() {panelGame.addKeyListener();}
 }

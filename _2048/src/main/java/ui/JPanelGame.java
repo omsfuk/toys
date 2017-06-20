@@ -1,12 +1,14 @@
 package ui;
 
-import control.KeyControl;
-import control.MouseControl;
-import dto.DtoGame;
+import control.AI;
+import control.KeyController;
+import control.MouseController;
+import model.GameState;
 
 import javax.swing.JPanel;
 
 import java.awt.*;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,38 +21,34 @@ public class JPanelGame extends JPanel {
 	/**
 	 * 数据访问对象
 	 */
-    private DtoGame dto = null;
+    private GameState gameState = null;
 
     /**
      * 要绘制的层
      */
     private List<Layer> layers = new ArrayList<Layer>();
 
-    /**
-     * 构造器
-     * @param keyControl 键盘控制器
-     * @param mouseControl 鼠标控制器
-     * @param dto 数据访问对象
-     */
-    public JPanelGame(KeyControl keyControl, MouseControl mouseControl, DtoGame dto) {    	     
-    	this.dto = dto;
+    private KeyListener keyListener;
+
+
+    public JPanelGame(UIContext uiContext, GameState gameState) {
+    	this.gameState = gameState;
+    	keyListener = new KeyController(uiContext, new AI(uiContext, gameState));
     	// 初始化图层对象
         initializedLayers();
         // 添加键盘控制
-        this.addKeyListener(keyControl);     
+        this.addKeyListener(keyListener);
         // 添加鼠标控制
-        this.addMouseListener(mouseControl);
-        // 添加鼠标控制层
-        mouseControl.setLayer(layers.get(1));
+        this.addMouseListener(new MouseController(uiContext, layers.get(1)));
     }
 
     private void initializedLayers() {
     	// 创建各个显示层
         layers.add(new LayerBackground(0,0, 368, 448));
         layers.add(new LayerStart(16, 16, 160, 64));
-        layers.add(new LayerScore(192, 16, 160, 64, this.dto));
-        layers.add(new LayerGame(16, 96, 336, 336, this.dto));
-        layers.add(new LayerLose(16, 96, 336, 336, this.dto));
+        layers.add(new LayerScore(192, 16, 160, 64, this.gameState));
+        layers.add(new LayerGame(16, 96, 336, 336, this.gameState));
+        layers.add(new LayerLose(16, 96, 336, 336, this.gameState));
         
     }
 
@@ -79,10 +77,10 @@ public class JPanelGame extends JPanel {
         // 设置延时
         int interval = 5;
         // 移动间距
-        int[][] spanX = new int[DtoGame.COL][DtoGame.ROW];
-        int[][] spanY = new int[DtoGame.COL][DtoGame.ROW];
+        int[][] spanX = new int[GameState.COL][GameState.ROW];
+        int[][] spanY = new int[GameState.COL][GameState.ROW];
         // 获得游戏地图
-        int[][] gameMap = dto.getGameMap();
+        int[][] gameMap = gameState.getGameMap();
         // 获得移动间距
         getSpan(spanX, spanY, offest, fps);
 
@@ -98,8 +96,8 @@ public class JPanelGame extends JPanel {
             g.drawImage(Img.BACKGROUND1, 0, 0, 336, 336, 0, 0, 1, 1, null);
 
             // 绘制背景方块
-            for (int col = 0; col < DtoGame.COL; col++) {
-                for (int row = 0; row < DtoGame.ROW; row++) {
+            for (int col = 0; col < GameState.COL; col++) {
+                for (int row = 0; row < GameState.ROW; row++) {
                 	
                 	// 在被移动方块的原位置绘制空方块
                     if((offest[col][row].x != col) || (offest[col][row].y != row)) {                    	
@@ -130,8 +128,8 @@ public class JPanelGame extends JPanel {
             }
 
             // 绘制被移动方块
-            for (int col = 0; col < DtoGame.COL; col++) {
-                for (int row = 0; row < DtoGame.ROW; row++) {
+            for (int col = 0; col < GameState.COL; col++) {
+                for (int row = 0; row < GameState.ROW; row++) {
                     if((offest[col][row].x == col) && (offest[col][row].y == row)) {
                         continue;
                     }
@@ -168,12 +166,20 @@ public class JPanelGame extends JPanel {
      */
     private void getSpan(int[][] spanX, int[][] spanY, final Point[][] offest, int fps) {
     
-        for (int col = 0; col < DtoGame.COL; col++) {
-            for (int row = 0; row < DtoGame.ROW; row++) {
+        for (int col = 0; col < GameState.COL; col++) {
+            for (int row = 0; row < GameState.ROW; row++) {
                 Point point = offest[col][row];
                 spanX[col][row] = (point.x - col) * 80 / fps;
                 spanY[col][row] = (point.y - row) * 80 / fps;
             }
         }
+    }
+
+    public void removeKeyListener() {
+        this.removeKeyListener(keyListener);
+    }
+
+    public void addKeyListener() {
+        this.addKeyListener(keyListener);
     }
 }

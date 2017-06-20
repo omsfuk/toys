@@ -1,9 +1,9 @@
-package dto;
+package model;
 
 /**
  * Created by Administrator on 2016/11/26.
  */
-public class DtoGame {
+public class GameState {
     
     /**
      * 行数
@@ -46,7 +46,7 @@ public class DtoGame {
     /**
      * 通过不产生新DtoGame对象的方式来刷新游戏
      */
-    public void newDtoGame() {
+    public void refreshGameState() {
     	score = 0;
     	for (int col = 0; col < COL; col++) {
     		for (int row = 0; row < ROW; row++) {

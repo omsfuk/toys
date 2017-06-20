@@ -3,7 +3,7 @@ package ui;
 import java.awt.Font;
 import java.awt.Graphics;
 
-import dto.DtoGame;
+import model.GameState;
 
 /**
  * Created by Administrator on 2016/11/26.
@@ -18,7 +18,7 @@ public class LayerScore extends Layer {
 	/**
 	 * 数据访问对象
 	 */
-	private DtoGame dto = null;
+	private GameState gameState = null;
 	
     /**
      * 构造方法
@@ -27,18 +27,18 @@ public class LayerScore extends Layer {
      * @param width 宽度
      * @param height 高度
      */
-    public LayerScore(int x, int y, int width, int height, DtoGame dto) {
+    public LayerScore(int x, int y, int width, int height, GameState gameState) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-        this.dto = dto;
+        this.gameState = gameState;
     }
 
     @Override
     public void paint(final Graphics g) {  
     	g.setFont(font);
     	g.drawImage(Img.SCORE, this.x, this.y, this.width, this.height, null);
-    	g.drawString(Integer.toString(dto.score), this.x + 50, this.y + 50);
+    	g.drawString(Integer.toString(gameState.score), this.x + 50, this.y + 50);
     }
 }

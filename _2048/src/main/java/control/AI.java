@@ -1,68 +1,70 @@
 package control;
 
-import dto.DtoGame;
+
+import model.GameState;
+import ui.UIContext;
 
 import java.awt.*;
 
-public class ComputerControl {
+public class AI {
 	
 	/**
 	 * 数据访问对象
 	 */
-	private DtoGame dto = null;
+	private GameState gameState;
 
 	/**
 	 * 核心控制模块
 	 */
-	public CoreControl coreControl = null;
+	public UIContext uiContext;
 	
 	/**
 	 * 构造器
-	 * @param coreControl 核心控制模块
+	 * @param uiContext 核心控制模块
 	 */
-	public ComputerControl(CoreControl coreControl, DtoGame dto) {
-		this.coreControl = coreControl;		
-		this.dto = dto;
+	public AI(UIContext uiContext, GameState gameState) {
+		this.uiContext = uiContext;
+		this.gameState = gameState;
 	}
 
 	/**
 	 * AI 程序
 	 */
-	public void AI() {
+	public void execute() {
 		
-		while(!dto.isLost) {
+		while(!gameState.isLost) {
 			int max = 0;
 			int maxp = 0;
-			int assess = search(getGameMap(getUpCombine(getGameMapCopy())), 1, getAssessValue(dto.getGameMap()));
+			int assess = search(getGameMap(getUpCombine(getGameMapCopy())), 1, getEvaluatedValue(gameState.getGameMap()));
 			if(assess > max) {
 				max = assess;
 				maxp = 0;
 			}
 			
-			assess = search(getGameMap(getDownCombine(getGameMapCopy())), 1, getAssessValue(dto.getGameMap()));
+			assess = search(getGameMap(getDownCombine(getGameMapCopy())), 1, getEvaluatedValue(gameState.getGameMap()));
 			if(assess > max) {
 				max = assess;
 				maxp = 1;
 			}
 	
-			assess = search(getGameMap(getLeftCombine(getGameMapCopy())), 1, getAssessValue(dto.getGameMap()));
+			assess = search(getGameMap(getLeftCombine(getGameMapCopy())), 1, getEvaluatedValue(gameState.getGameMap()));
 			if(assess > max) {
 				max = assess;
 				maxp = 2;
 			}
 
-			assess = search(getGameMap(getRightCombine(getGameMapCopy())), 1, getAssessValue(dto.getGameMap()));
+			assess = search(getGameMap(getRightCombine(getGameMapCopy())), 1, getEvaluatedValue(gameState.getGameMap()));
 			if(assess > max) {
 				max = assess;
 				maxp = 3;
 			}
 
-			if(!dto.isLost) {
+			if(!gameState.isLost) {
 				switch(maxp) {
-					case 0 : coreControl.keyUp();break;
-					case 1 : coreControl.keyDown();break;
-					case 2 : coreControl.keyLeft();break;
-					case 3 : coreControl.keyRight();break;
+					case 0 : uiContext.up();break;
+					case 1 : uiContext.down();break;
+					case 2 : uiContext.left();break;
+					case 3 : uiContext.right();break;
 					default : break;
 				}
 			}
@@ -71,12 +73,12 @@ public class ComputerControl {
 	}
 	
 	// 搜索算法
-	public int search(int[][] gameMap, int deep, int score) {			
+	private int search(int[][] gameMap, int deep, int score) {
 		if(deep > 1) {
-			return getAssessValue(gameMap);
+			return getEvaluatedValue(gameMap);
 		}
 		
-		if(score == getAssessValue(gameMap)) {
+		if(score == getEvaluatedValue(gameMap)) {
 			return 0;
 		}
 		
@@ -108,7 +110,7 @@ public class ComputerControl {
 	 * @param gameMap 游戏地图
 	 * @return 评估值
 	 */
-	private int getAssessValue(int[][] gameMap) {
+	private int getEvaluatedValue(int[][] gameMap) {
 		int assess = 0;
 		for (int col = 0; col < 4; col++) {
 			for (int row = 0; row < 4; row++) {
@@ -126,33 +128,33 @@ public class ComputerControl {
 	 * @return 游戏地图
 	 */
 	private int[][] getGameMap(Point[][] offest) {
-		int[][] gameMap = dto.getGameMap();
+		int[][] gameMap = gameState.getGameMap();
 		int[][] gameMap0 = new int[4][4];
-        for (int col = 0; col < 4; col++) {
-            for (int row = 0; row < 4; row++) {
-            	if(gameMap[col][row] == 0) {
-            		continue;
-            	}
-            	if(gameMap0[offest[col][row].x][offest[col][row].y] != 0) {
-            		gameMap0[offest[col][row].x][offest[col][row].y] ++;            		
-            	} else {
-            		gameMap0[offest[col][row].x][offest[col][row].y] = gameMap[col][row];
-            	}
-            }
-        }
-        return gameMap0;
+		for (int col = 0; col < 4; col++) {
+			for (int row = 0; row < 4; row++) {
+				if(gameMap[col][row] == 0) {
+					continue;
+				}
+				if(gameMap0[offest[col][row].x][offest[col][row].y] != 0) {
+					gameMap0[offest[col][row].x][offest[col][row].y] ++;
+				} else {
+					gameMap0[offest[col][row].x][offest[col][row].y] = gameMap[col][row];
+				}
+			}
+		}
+		return gameMap0;
 	}
 	
 	/**
      * 上合并
      * @return 移动对应位置
      */
-    public Point[][] getUpCombine(int[][] gameMap) {
-        Point[][] offest = new Point[DtoGame.COL][DtoGame.ROW];
+    private Point[][] getUpCombine(int[][] gameMap) {
+        Point[][] offest = new Point[GameState.COL][GameState.ROW];
         
-        for (int col = 0; col < DtoGame.COL; col++) {
-        	for (int row = 0; row < DtoGame.ROW; row++) {
-        		boolean[] isDealed = new boolean[DtoGame.ROW];
+        for (int col = 0; col < GameState.COL; col++) {
+        	for (int row = 0; row < GameState.ROW; row++) {
+        		boolean[] isDealed = new boolean[GameState.ROW];
         		int rowTest = row - 1;
         		   
         		if(gameMap[col][row] == 0) {
@@ -187,12 +189,12 @@ public class ComputerControl {
      * 下合并
      * @return 移动对应位置
      */
-    public Point[][] getDownCombine(int[][] gameMap) {
-        Point[][] offest = new Point[DtoGame.COL][DtoGame.ROW];
+    private Point[][] getDownCombine(int[][] gameMap) {
+        Point[][] offest = new Point[GameState.COL][GameState.ROW];
         
-        for (int col = 0; col < DtoGame.COL; col++) {
-        	for (int row = DtoGame.ROW - 1; row > -1; row--) {
-        		boolean[] isDealed = new boolean[DtoGame.ROW];
+        for (int col = 0; col < GameState.COL; col++) {
+        	for (int row = GameState.ROW - 1; row > -1; row--) {
+        		boolean[] isDealed = new boolean[GameState.ROW];
         		int rowTest = row + 1;
         		   
         		if(gameMap[col][row] == 0) {
@@ -200,11 +202,11 @@ public class ComputerControl {
         			continue;
         		}
         		
-        		while(rowTest < DtoGame.ROW && gameMap[col][rowTest] == 0) {
+        		while(rowTest < GameState.ROW && gameMap[col][rowTest] == 0) {
         			rowTest ++;
         		}
         		
-        		if(rowTest > DtoGame.ROW - 1) {
+        		if(rowTest > GameState.ROW - 1) {
         			offest[col][row] = new Point(col, rowTest - 1);        	
         			moveBlock(gameMap, col, row, col, rowTest - 1);        			
         			continue;
@@ -227,12 +229,12 @@ public class ComputerControl {
      * 左合并
      * @return 移动对应位置
      */
-    public Point[][] getLeftCombine(int[][] gameMap) {    	
-        Point[][] offest = new Point[DtoGame.COL][DtoGame.ROW];
+    private Point[][] getLeftCombine(int[][] gameMap) {
+        Point[][] offest = new Point[GameState.COL][GameState.ROW];
         
-        for (int row = 0; row < DtoGame.ROW; row++) {
-        	for (int col = 0; col < DtoGame.COL; col++) {
-        		boolean[] isDealed = new boolean[DtoGame.COL];
+        for (int row = 0; row < GameState.ROW; row++) {
+        	for (int col = 0; col < GameState.COL; col++) {
+        		boolean[] isDealed = new boolean[GameState.COL];
         		int colTest = col - 1;
         		   
         		if(gameMap[col][row] == 0) {
@@ -267,12 +269,12 @@ public class ComputerControl {
      * 右合并
      * @return 移动对应位置
      */
-    public Point[][] getRightCombine(int[][] gameMap) {
-        Point[][] offest = new Point[DtoGame.COL][DtoGame.ROW];
+    private Point[][] getRightCombine(int[][] gameMap) {
+        Point[][] offest = new Point[GameState.COL][GameState.ROW];
         
-        for (int row = 0; row < DtoGame.ROW; row++) {
-        	for (int col = DtoGame.ROW - 1; col > -1; col--) {
-        		boolean[] isDealed = new boolean[DtoGame.COL];
+        for (int row = 0; row < GameState.ROW; row++) {
+        	for (int col = GameState.ROW - 1; col > -1; col--) {
+        		boolean[] isDealed = new boolean[GameState.COL];
         		int colTest = col + 1;
         		   
         		if(gameMap[col][row] == 0) {
@@ -280,11 +282,11 @@ public class ComputerControl {
         			continue;
         		}
         		
-        		while(colTest < DtoGame.COL && gameMap[colTest][row] == 0) {
+        		while(colTest < GameState.COL && gameMap[colTest][row] == 0) {
         			colTest ++;
         		}
         		
-        		if(colTest > DtoGame.COL - 1) {
+        		if(colTest > GameState.COL - 1) {
         			offest[col][row] = new Point(colTest - 1, row);        	
         			moveBlock(gameMap, col, row, colTest - 1, row);        			
         			continue;
@@ -305,14 +307,13 @@ public class ComputerControl {
     
     /**
      * 获得游戏地图的一个副本
-     * @param gameMap2 
      * @return 游戏地图副本
      */
     private int[][] getGameMapCopy() {
-        int[][] gameMap = new int[dto.COL][dto.ROW];
-        int[][] gameMapTmp = dto.getGameMap();
-        for (int col = 0; col < dto.COL; col++) {
-            for (int row = 0; row < dto.ROW; row++) {
+        int[][] gameMap = new int[gameState.COL][gameState.ROW];
+        int[][] gameMapTmp = gameState.getGameMap();
+        for (int col = 0; col < gameState.COL; col++) {
+            for (int row = 0; row < gameState.ROW; row++) {
                 gameMap[col][row] = gameMapTmp[col][row];
             }
         }
@@ -321,13 +322,13 @@ public class ComputerControl {
     
     /**
      * 获得游戏地图的一个副本
-     * @param gameMap2 
+     * @param gameMapTmp
      * @return 游戏地图副本
      */
     private int[][] getGameMapCopy(int[][] gameMapTmp) {
     	int[][] gameMap = new int[4][4];
-        for (int col = 0; col < dto.COL; col++) {
-            for (int row = 0; row < dto.ROW; row++) {
+        for (int col = 0; col < gameState.COL; col++) {
+            for (int row = 0; row < gameState.ROW; row++) {
                 gameMap[col][row] = gameMapTmp[col][row];
             }
         }

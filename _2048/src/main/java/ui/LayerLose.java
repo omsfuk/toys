@@ -1,6 +1,6 @@
 package ui;
 
-import dto.DtoGame;
+import model.GameState;
 
 import java.awt.Graphics;
 
@@ -12,7 +12,7 @@ public class LayerLose extends Layer{
 	/**
 	 * 数据访问对象
 	 */
-	private DtoGame dto = null;
+	private GameState dto = null;
 
 	/**
 	 * 构造器
@@ -22,7 +22,7 @@ public class LayerLose extends Layer{
 	 * @param height 高度
 	 * @param dto 数据传输对象
 	 */
-    public LayerLose(int x, int y, int width, int height, DtoGame dto) {
+    public LayerLose(int x, int y, int width, int height, GameState dto) {
         this.x = x;
         this.y = y;
         this.width = width;
